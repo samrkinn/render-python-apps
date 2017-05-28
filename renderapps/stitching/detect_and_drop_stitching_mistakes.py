@@ -24,7 +24,7 @@ example_json={
         "jsonDirectory":"directory to save",
         "edge_threshold":1843, #default
         "pool_size":20, #default
-        "distance_threshold":50, #default
+        "distance_threshold":50 #default
 
 }
 
@@ -49,6 +49,7 @@ class DetectAndDropStitchingMistakesParameters(RenderParameters):
 
 def process_section(z,
     render=None,
+    jsonDirectory='',
     prestitchedStack='',
     poststitchedStack='',
     outputStack='',
@@ -60,7 +61,7 @@ def process_section(z,
     Gpos = {} #dictionary to store positions of tiles
     
     #get all the tilespecs for this z from prestitched stack
-    pre_tilespecs = renderapi.tilespec.get_tile_specs_from_z(prestitchedStack, z, render=renderapi)
+    pre_tilespecs = renderapi.tilespec.get_tile_specs_from_z(prestitchedStack, z, render=render)
     #insert them into the Rtree with their bounding boxes to assist in finding overlaps
     #label them by order in pre_tilespecs
     [ridx.insert(i,(ts.minX,ts.minY,ts.maxX,ts.maxY)) for i,ts in enumerate(pre_tilespecs)]
@@ -85,11 +86,12 @@ def process_section(z,
         
         #assuming the first transform is the right one, and is only translation
         #this is the vector between these two tilespecs
-        dpre=pre_tilespecs[p].tforms[0].M[0:2,3]-pre_tilespecs[q].tforms[0].M[0:2,3]
+        #print pre_tilespecs[p].tforms[0]
+        dpre=pre_tilespecs[p].tforms[0].M[0:2,2]-pre_tilespecs[q].tforms[0].M[0:2,2]
         #this is therefore the distance between them
         dp = np.sqrt(np.sum(dpre**2))
         #this is the vector between them after stitching
-        dpost=post_tilespecs[p].tforms[0].M[0:2,3]-post_tilespecs[q].tforms[0].M[0:2,3]
+        dpost=post_tilespecs[p].tforms[0].M[0:2,2]-post_tilespecs[q].tforms[0].M[0:2,2]
         #this is the amplitude of the vector between the pre and post vectors (delta delta vector)
         delt = np.sqrt(np.sum((dpre-dpost)**2))
         #store it in the edge property dictionary
@@ -106,7 +108,7 @@ def process_section(z,
     #use it to pick out the good post stitch tilspecs that remain in the graph
     ts_good_json = [post_tilespecs[node].to_dict() for node in Gc.nodes_iter()]
     #formulate a place to save them
-    jsonfilepath = os.path.join(a.jsonDirectory,'%s_z%04.0f.json'%(outputStack,z))
+    jsonfilepath = os.path.join(jsonDirectory,'%s_z%04.0f.json'%(outputStack,z))
     #dump the json to that location
     json.dump(ts_good_json,open(jsonfilepath ,'w'))
     #return the name of the file
@@ -130,9 +132,13 @@ class DetectAndDropStitchingMistakes(RenderModule):
 
 
         #define a partial function that takes in a single z
-        partial_process = partial(process_section,renderObj=render,prestitchedStack=self.args['prestitchedStack'],
+        partial_process = partial(process_section,render=self.render,prestitchedStack=self.args['prestitchedStack'],
             poststitchedStack=self.args['poststitchedStack'],outputStack=self.args['outputStack'],
-            distance_threshold=self.args['distance_threshold'],edge_threshold=self.args['edge_threshold'])
+            distance_threshold=self.args['distance_threshold'],edge_threshold=self.args['edge_threshold'],
+            jsonDirectory=self.args['jsonDirectory'])
+
+        #for z in zvalues:
+        #    partial_process(z)
 
         #parallel process all sections
         with renderapi.client.WithPool(self.args['pool_size']) as pool:

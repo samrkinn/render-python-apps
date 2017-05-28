@@ -4,6 +4,7 @@ MAINTAINER Forrest Collman (forrest.collman@gmail.com)
 RUN mkdir -p /usr/local/render-python-apps
 WORKDIR /usr/local
 RUN conda install jupyter
+RUN conda install matplotlib
 RUN pip install tifffile
 RUN pip install opencv-python
 RUN pip install pandas
