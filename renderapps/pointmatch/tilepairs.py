@@ -18,9 +18,9 @@ def find_tile_pair_match_in_z(render,stack,p,p_geom,z2,minx,miny,width,height,ov
     paired = render.run(renderapi.tilespec.get_tile_specs_from_box,stack,z2,minx,miny,width,height)
     for ts2 in paired:
         ts2_geom = tilespec_to_bounding_box_polygon(ts2)
-        overlap = ts_geom.intersection(ts2_geom)
-        frac_overlap = overlap.area/ts_geom.area
-        if frac_overlap > area_overlap_frac:
+        overlap = p_geom.intersection(ts2_geom)
+        frac_overlap = overlap.area/p_geom.area
+        if frac_overlap > overlap_frac:
             q = {}
             q['id']=ts2.tileId
             q['groupId']=ts2.layout.sectionId
@@ -39,7 +39,7 @@ def define_box_and_geometry(ts,radius):
     p['groupId']=ts.layout.sectionId
     return ts_geom,width,height,minx,miny,p
 
-def find_tile_pairs_in_radius(render,stack,ts,z,dz,radius,area_overlap_frac=.25):
+def find_tile_pairs_in_radius(render,stack,ts,z,dz,radius,overlap_frac=.25):
     pairs = []
     ts_geom,width,height,minx,miny,p = define_box_and_geometry(ts,radius)
 
