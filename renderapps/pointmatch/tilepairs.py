@@ -1,4 +1,4 @@
-import renderapi
+import renderapi.stack
 from ..shapely import tilespec_to_bounding_box_polygon
 import marshmallow as mm
 
@@ -86,3 +86,10 @@ def create_tile_pair_across_z_break(render,stack,z,dz=10,radius=.1,pool_size=20,
                     pairs += find_tile_pair_match_in_z(render,stack,p,p_geom,z2,minx,miny,width,height,overlap_frac)
 
     return format_pairfile(render,stack,pairs,queryParameters)
+
+def calculate_point_match_normalization_model(render,stack,matchcollection,minz=None,maxz=None,**kwargs):
+    #function that returns a normalization model for figuring out the average number of matches
+    #for a specific delta z within an existing match colleciton.
+    #calculate_point_match_normalization_model(render,stack,matchcollection,minz=None,maxz=None,**kwargs);
+    #minz and maxz default to the stack bounds
+    zvalues =np.array(renderapi.stack.get_z_values_for_stack(stack,render=render))
