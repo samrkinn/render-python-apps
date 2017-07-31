@@ -2,7 +2,7 @@ import numpy as np
 import renderapi
 import json
 import os
-from ..module.render_module import RenderTrakEM2Parameters, TrakEM2RenderModule
+from ..module.render_module import RenderTrakEM2Parameters, TrakEM2RenderModule, RenderModule
 from ..shapely import tilespec_to_bounding_box_polygon
 from argschema.fields import Str, InputFile
 from shapely import geometry

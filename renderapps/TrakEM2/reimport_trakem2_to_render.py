@@ -7,7 +7,7 @@ from trakem2utils import (createchunks, createheader, createproject,
                           createlayerset, createfooters,
                           createlayer_fromtilespecs, Chunk)
 import json
-from ..module.render_module import TEM2ProjectTransfer, TrakEM2RenderModule, EMLMRegistrationParameters
+from ..module.render_module import TEM2ProjectTransfer, TrakEM2RenderModule, EMLMRegistrationParameters, RenderModule
 import numpy as np
 
 example_parameters = {

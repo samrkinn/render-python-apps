@@ -4,7 +4,7 @@ import json
 import os
 import renderapi
 from ..module.render_module import RenderModule, RenderParameters
-from argschema.fields import InputFile, InputDir, OutputDir, Str, Float, Int
+from argschema.fields import InputFile, InputDir, Str, Float, Int
 from functools import partial
 
 
@@ -27,7 +27,7 @@ class MakeDownsampleSectionStackParameters(RenderParameters):
         metadata={'description':'stack to make a downsample version of'})
     scale = Float(required=False,default = .01,
         metadata={'description':'scale to make images'})
-    image_directory = OutputDir(required=True,
+    image_directory = Str(required=True,
         metadata={'decription','path to save section images'})
     output_stack = Str(required=True,
         metadata={'description':'output stack to name'})

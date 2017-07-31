@@ -6,7 +6,7 @@ import os
 import sys
 from renderapi.utils import stripLogger
 import argparse
-from ..module.render_module import TrakEM2RenderModule, RenderParameters, EMLMRegistrationParameters
+from ..module.render_module import TrakEM2RenderModule, RenderParameters, EMLMRegistrationParameters, RenderModule
 import marshmallow as mm
 
 example_json = {

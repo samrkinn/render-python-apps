@@ -44,9 +44,9 @@ class CreateTilePairsForSingleZParameters(RenderParameters):
         metadata = {'description':'path to save tilepair file output'})
     radius = argschema.fields.Float(required=False,default=.1,
         metadata={'description':'fraction of tile radius to look for pairs'})
-    overlap_frac = mm.fields.Float(required=False,default=.25,
+    overlap_frac = argschema.fields.Float(required=False,default=.25,
         metadata={'description':'fraction of tile area overlap necessary to include in pairfile'})
-    pool_size = mm.fields.Int(required=False,default=20,
+    pool_size = argschema.fields.Int(required=False,default=20,
         metadata={'description':'number of parallel processes (default 20)'})
     queryParameters = argschema.fields.Nested(queryParameters,required=False,
         metadata={'description':'extra query parameters to add on to tilepair file if you have it'})
