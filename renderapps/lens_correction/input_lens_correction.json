@@ -1,6 +1,8 @@
 {
-	"manifest_path": "/home/samk/projects/lens_correction_module/Wij_Set_594451332/594089217_594451332/metawithpath.txt",
-	"project_path": "/home/samk/projects/lens_correction_module/Wij_Set_594451332/594089217_594451332/",
+	"manifest_path": "/home/samk/projects/lens_correction/Wij_Set_594451332/594089217_594451332/_trackem_20170502174048_295434_5LC_0064_01_20170502174047_reference_0_.txt",
+	"project_path": "/home/samk/projects/lens_correction/Wij_Set_594451332/594089217_594451332/",
+	"fiji_path": "/home/samk/projects/lens_correction/Fiji.app/ImageJ-linux64",
+	"grid_size": 3,
 	"SIFT_params": {
 		"initialSigma": 1.6,
 		"steps": 3,
@@ -9,7 +11,7 @@
 		"fdSize": 4,
 		"fdBins": 8
 	},
-	"other_params": {
+	"align_params": {
 		"rod": 0.92,
 		"maxEpsilon": 5.0,
 		"minInlierRatio": 0.0,

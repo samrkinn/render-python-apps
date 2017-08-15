@@ -1,63 +1,49 @@
 import os
 import json
 from argschema import ArgSchema, ArgSchemaParser
-from argschema.fields import Bool, Float, Int, Nested, Str
+from argschema.fields import Bool, Float, Int, Nested, Str, List
 from argschema.schemas import DefaultSchema
 import renderapi
-
-class RenderParameters(DefaultSchema):
-	host = Str(required=True,
-		metadata={'description': ''})
-	port = Int(required=True,
-		metadata={'description': ''})
-	owner = Str(required=True,
-		metadata={'description': ''})
-	project = Str(required=True,
-		metadata={'description': ''})
-	render_client_scripts = Str(required=True,
-		metadata={'description': ''})
+from ..module.render_module import RenderModule, RenderParameters
 
 class TransformParameters(DefaultSchema):
 	tf_type = Str(required=True,
-		metadata={'description': ''})
+		description='')
 	className = Str(required=True,
-		metadata={'description': ''})
+		description='')
 	dataString = Str(required=True,
-		metadata={'description': ''})
+		description='')
 
-class StackParameters(ArgSchema):
-	render = Nested(RenderParameters)
+class ApplyLensCorrectionParameters(RenderParameters):
 	stack = Str(required=True,
-		metadata={'description': ''})
-	zs = Int(required=True,
-		metadata={'description': ''})
+		description='')
+	zs = List(Int, required=True,
+		description='')
 	transform = Nested(TransformParameters)
-	refId = Str(required=True,
-		metadata={'description': ''})
+	refId = String(allow_none=True, required=True,
+		description='')
 
-class ApplyLensCorrection(ArgSchemaParser):
+class ApplyLensCorrection(RenderModule):
 	def __init__(self, *args, **kwargs):
 		super(ApplyLensCorrection, self).__init__(schema_type = 
-			StackParameters, *args, **kwargs)
+			ApplyLensCorrectionParameters, *args, **kwargs)
 
 	def run(self):
-		with open("lens_correction.json", "r") as json_file:
-			tf = json.load(json_file)
+		print self.args
 
-		self.args['transform']['tf_type'] = tf['transform']['type']
-		self.args['transform']['className'] = tf['transform']['className']
-		self.args['transform']['dataString'] = tf['transform']['dataString']
+		output = {
+			"stack": "",
+			"refId": ""
+		}
 
 		# Build stack from z(s) with lens correction
 
-		output = {
-			"render": {},
-			"stack": "MONTAGESTACK",
-			"refId": "8ccxdfs394875asdv"
-		}
+		output['stack'] = self.args['output_stack']
+		output['refId'] = "8ccxdfs394875asdv"
+
+		print 'DONE!'
 
 if __name__ == '__main__':
-
 	example_input = {
 		"render": {
 			"host": "em-131fs",
@@ -66,12 +52,13 @@ if __name__ == '__main__':
 			"project": "SPECIMEN",
 			"render_client_scripts": "/PATH/TO/CLIENTSCRIPTS/"
 		},
-		"stack": "MONTAGESTACK",
+		"input_stack": "MONTAGESTACK1",
+		"output_stack": "MONTAGESTACK2",
 		"zs": 2201,
 		"transform": {
-			"tf_type": "",
-			"className": "",
-			"dataString": ""
+			"tf_type": "leaf",
+			"className": "lenscorrection.NonLinearTransform",
+			"dataString": "5 21 1056.1583492292154 5.643427565050266 ... 1.41164653564974448E17 1.99258104942372064E17 0.0 3840 3840 "
 		},
 		"refId": "None"
 	}

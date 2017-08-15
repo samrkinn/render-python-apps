@@ -8,61 +8,65 @@ import renderapi
 
 class SIFTParameters(DefaultSchema):
     initialSigma = Float(required=True,
-        metadata={'description': ''})
+        description='')
     steps = Int(required=True,
-        metadata={'description': ''})
+        description='')
     minOctaveSize = Int(required=True,
-        metadata={'description': ''})
+        description='')
     maxOctaveSize = Int(required=True,
-        metadata={'description': ''})
+        description='')
     fdSize = Int(required=True,
-        metadata={'description': ''})
+        description='')
     fdBins = Int(required=True,
-        metadata={'description': ''})
+        description='')
 
-class OtherParameters(DefaultSchema):
+class AlignmentParameters(DefaultSchema):
     rod = Float(required=True,
-        metadata={'description': ''})
+        description='')
     maxEpsilon = Float(required=True,
-        metadata={'description': ''})
+        description='')
     minInlierRatio = Float(required=True,
-        metadata={'description': ''})
+        description='')
     minNumInliers = Int(required=True,
-        metadata={'description': ''})
+        description='')
     expectedModelIndex = Int(required=True,
-        metadata={'description': ''})
+        description='')
     multipleHypotheses = Bool(required=True,
-        metadata={'description': ''})
+        description='')
     rejectIdentity = Bool(required=True,
-        metadata={'description': ''})
+        description='')
     identityTolerance = Float(required=True,
-        metadata={'description': ''})
+        description='')
     tilesAreInPlace = Bool(required=True,
-        metadata={'description': ''})
+        description='')
     desiredModelIndex = Int(required=True,
-        metadata={'description': ''})
+        description='')
     regularize = Bool(required=True,
-        metadata={'description': ''})
+        description='')
     maxIterationsOptimize = Int(required=True,
-        metadata={'description': ''})
+        description='')
     maxPlateauWidthOptimize = Int(required=True,
-        metadata={'description': ''})
+        description='')
     dimension = Int(required=True,
-        metadata={'description': ''})
+        description='')
     lambdaVal = Float(required=True,
-        metadata={'description': ''})
+        description='')
     clearTransform = Bool(required=True,
-        metadata={'description': ''})
+        description='')
     visualize = Bool(required=True,
-        metadata={'description': ''})
+        description='')
 
 class LensCorrectionParameters(ArgSchema):
     manifest_path = Str(required=True,
-        metadata={'description': 'path to manifest file'})
+        description='path to manifest file')
     project_path = Str(required=True,
-        metadata={'description': 'path to project directory'})
+        description='path to project directory')
+    fiji_path = Str(required=True,
+        description='path to FIJI')
+    grid_size = Int(required=True,
+        description='')
     SIFT_params = Nested(SIFTParameters)
-    other_params = Nested(OtherParameters)
+    align_params = Nested(AlignmentParameters)
 
 class LensCorrectionModule(ArgSchemaParser):
     def __init__(self, *args, **kwargs):
@@ -72,35 +76,36 @@ class LensCorrectionModule(ArgSchemaParser):
     def run(self):
         bsh_call = ["xvfb-run",
             "-a",
-            "Fiji.app/ImageJ-linux64",
+            self.args['fiji_path'],
             "-Xms20g", "-Xmx20g", "-Xincgc",
-            "-Dfile=" + self.args['manifest_path'],
+            "-Dman=" + self.args['manifest_path'],
             "-Ddir=" + self.args['project_path'],
+            "-Dgrid=" + str(self.args['grid_size']),
             "-Disig=" + str(self.args['SIFT_params']['initialSigma']),
             "-Dsteps=" + str(self.args['SIFT_params']['steps']),
             "-Dminos=" + str(self.args['SIFT_params']['minOctaveSize']),
             "-Dmaxos=" + str(self.args['SIFT_params']['maxOctaveSize']),
             "-Dfdsize=" + str(self.args['SIFT_params']['fdSize']),
             "-Dfdbins=" + str(self.args['SIFT_params']['fdBins']),
-            "-Drod=" + str(self.args['other_params']['rod']),
-            "-Dmaxe=" + str(self.args['other_params']['maxEpsilon']),
-            "-Dmir=" + str(self.args['other_params']['minInlierRatio']),
-            "-Dmni=" + str(self.args['other_params']['minNumInliers']),
-            "-Demi=" + str(self.args['other_params']['expectedModelIndex']),
-            "-Dmh=" + str(self.args['other_params']['multipleHypotheses']),
-            "-Dri=" + str(self.args['other_params']['rejectIdentity']),
-            "-Dit=" + str(self.args['other_params']['identityTolerance']),
-            "-Dtaip=" + str(self.args['other_params']['tilesAreInPlace']),
-            "-Ddmi=" + str(self.args['other_params']['desiredModelIndex']),
-            "-Dreg=" + str(self.args['other_params']['regularize']),
+            "-Drod=" + str(self.args['align_params']['rod']),
+            "-Dmaxe=" + str(self.args['align_params']['maxEpsilon']),
+            "-Dmir=" + str(self.args['align_params']['minInlierRatio']),
+            "-Dmni=" + str(self.args['align_params']['minNumInliers']),
+            "-Demi=" + str(self.args['align_params']['expectedModelIndex']),
+            "-Dmh=" + str(self.args['align_params']['multipleHypotheses']),
+            "-Dri=" + str(self.args['align_params']['rejectIdentity']),
+            "-Dit=" + str(self.args['align_params']['identityTolerance']),
+            "-Dtaip=" + str(self.args['align_params']['tilesAreInPlace']),
+            "-Ddmi=" + str(self.args['align_params']['desiredModelIndex']),
+            "-Dreg=" + str(self.args['align_params']['regularize']),
             "-Dmio=" + 
-                str(self.args['other_params']['maxIterationsOptimize']),
+                str(self.args['align_params']['maxIterationsOptimize']),
             "-Dmpwo=" + 
-                str(self.args['other_params']['maxPlateauWidthOptimize']),
-            "-Ddim=" + str(self.args['other_params']['dimension']),
-            "-Dlam=" + str(self.args['other_params']['lambdaVal']),
-            "-Dctrans=" + str(self.args['other_params']['clearTransform']),
-            "-Dvis=" + str(self.args['other_params']['visualize']),
+                str(self.args['align_params']['maxPlateauWidthOptimize']),
+            "-Ddim=" + str(self.args['align_params']['dimension']),
+            "-Dlam=" + str(self.args['align_params']['lambdaVal']),
+            "-Dctrans=" + str(self.args['align_params']['clearTransform']),
+            "-Dvis=" + str(self.args['align_params']['visualize']),
             "--", "--no-splash",
             "run_lens_correction.bsh"]
 
