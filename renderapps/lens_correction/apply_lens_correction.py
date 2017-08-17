@@ -15,7 +15,6 @@ class TransformParameters(DefaultSchema):
 		description='')
 
 class ApplyLensCorrectionParameters(RenderParameters):
-	render = Nested(RenderParameters)
 	inputStack = Str(required=True,
 		description='')
 	outputStack = Str(required=True,
