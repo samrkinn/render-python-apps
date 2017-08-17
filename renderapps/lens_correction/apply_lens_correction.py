@@ -4,19 +4,7 @@ from argschema import ArgSchema, ArgSchemaParser
 from argschema.fields import Bool, Float, Int, Nested, Str, List
 from argschema.schemas import DefaultSchema
 import renderapi
-# from ..module.render_module import RenderModule, RenderParameters
-
-class RenderParameters(DefaultSchema):
-	host = Str(required=True,
-		description='')
-	port = Int(required=True,
-		description='')
-	owner = Str(required=True,
-		description='')
-	project = Str(required=True,
-		description='')
-	render_client_scripts = Str(required=True,
-		description='')
+from ..module.render_module import RenderModule, RenderParameters
 
 class TransformParameters(DefaultSchema):
 	tf_type = Str(required=True,
@@ -26,8 +14,7 @@ class TransformParameters(DefaultSchema):
 	dataString = Str(required=True,
 		description='')
 
-# class ApplyLensCorrectionParameters(RenderParameters):
-class ApplyLensCorrectionParameters(ArgSchema):
+class ApplyLensCorrectionParameters(RenderParameters):
 	render = Nested(RenderParameters)
 	inputStack = Str(required=True,
 		description='')
@@ -39,8 +26,7 @@ class ApplyLensCorrectionParameters(ArgSchema):
 	refId = Str(allow_none=True, required=True,
 		description='')
 
-# class ApplyLensCorrection(RenderModule):
-class ApplyLensCorrection(ArgSchemaParser):
+class ApplyLensCorrection(RenderModule):
 	def __init__(self, *args, **kwargs):
 		super(ApplyLensCorrection, self).__init__(schema_type = 
 			ApplyLensCorrectionParameters, *args, **kwargs)
