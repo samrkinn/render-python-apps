@@ -7,7 +7,7 @@ import renderapi
 from ..module.render_module import RenderModule, RenderParameters
 
 class TransformParameters(DefaultSchema):
-	tf_type = Str(required=True,
+	type = Str(required=True,
 		description='')
 	className = Str(required=True,
 		description='')
@@ -38,31 +38,34 @@ class ApplyLensCorrection(RenderModule):
 		transform = self.args['transform']
 		refId = self.args['refId']
 
+		# output dict
 		output = {
 			"stack": "",
 			"refId": ""
 		}
 
-		r = renderapi.connect(**render)
+		r = self.render
 
-		tspecs = renderapi.tilespec.get_tile_specs_from_stack(inputStack, 
-			render=r)
+		# new tile specs for each z selected
 		new_tspecs = []
+		for z in zs:
+			tspecs = renderapi.tilespec.get_tile_specs_from_z(inputStack, z, 
+				render=r)
 
-		for ts in tspecs:
-			ts_dict = ts.to_dict()
-			specList = [transform]
-			specList.extend(ts_dict['transforms']['specList'])
-			ts_dict['transforms']['specList'] = specList
-			ts.from_dict(ts_dict)
-			new_tspecs.append(ts)
+			for ts in tspecs:
+				lc_tform = renderapi.transform.Transform(json=transform)
+				ts.tforms = [lc_tform] + ts.tforms
+				new_tspecs.append(ts)
 
-		renderapi.stack.create_stack(outputStack,
-			owner=render['owner'], render=r)
-		renderapi.stack.set_stack_state(outputStack, 'LOADING',
-			owner=render['owner'], render=r)
-		renderapi.client.import_tilespecs(outputStack,
-			new_tspecs, poolsize=2, owner=render['owner'], render=r)
+		# statement to delete stack if desired
+		# renderapi.stack.delete_stack(outputStack, render=r)
+
+		# """
+		renderapi.stack.create_stack(outputStack, render=r)
+		renderapi.stack.set_stack_state(outputStack, 'LOADING', render=r)
+		renderapi.client.import_tilespecs(outputStack, new_tspecs, render=r)
+		renderapi.stack.set_stack_state(outputStack, 'COMPLETE', render=r)
+		# """
 
 		output['stack'] = outputStack
 		output['refId'] = "8ccxdfs394875asdv"
@@ -82,14 +85,14 @@ if __name__ == '__main__':
 		"outputStack": "test_LC",
 		"zs": [2266],
 		"transform": {
-			"tf_type": "leaf",
+			"type": "leaf",
 			"className": "lenscorrection.NonLinearTransform",
 			"dataString": """5 21 1078.539787490504 5.9536401731869155 
 				18.082459176969103 1078.355487979244 3.5307003058070348 
 				11.64046339965791 -2.0439286697147363 -24.64074017045258 
 				-41.26811513301735 -9.491349156078 -1.6954196055547417 
-				-9.185363883704582 3.2959653136929163 16.063471152021727 1
-				6.294847510892705 11.433417367508135 31.814503296730077 
+				-9.185363883704582 3.2959653136929163 16.063471152021727 
+				16.294847510892705 11.433417367508135 31.814503296730077 
 				8.568546283786144 1.1875763257283882 1.8390027135003706 
 				4.811216491589896 -6.951845669522106 -12.267142955347461 
 				-15.925381113080153 -14.870929614388771 -1.4936338107986824 
@@ -119,6 +122,9 @@ if __name__ == '__main__':
 		},
 		"refId": None
 	}
+
+	# remove tabs, endlines from dataString formatting above
+	example_input['transform']['dataString'] = example_input['transform']['dataString'].replace('\n\t\t\t\t', '')
 
 	module = ApplyLensCorrection(input_data = example_input)
 	module.run()
